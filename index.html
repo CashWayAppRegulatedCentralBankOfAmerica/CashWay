@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background-color: green;
+            color: white;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            color: black;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .deposit { background-color: blue; color: white; }
+        .withdrawal { background-color: purple; color: white; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container" id="dashboard">
+        <h2>Account Dashboard</h2>
+        <h3>Account Holder: Jacob Amaitsa</h3>
+        <h3>Current Balance: <span id="balance">664,086.73</span> KES</h3>
+        <button class="deposit" onclick="depositMoney()">Deposit</button>
+        <button class="withdrawal" onclick="showWithdrawalPage()">Withdrawal</button>
+        <button onclick="showTransactionHistory()">Transaction History</button>
+    </div>
+    
+    <div class="container hidden" id="withdrawal-page">
+        <h2>Select Transfer Method</h2>
+        <button onclick="showMpesaPage()">Mpesa</button>
+        <button onclick="alert('Bank transfer is not available yet')">Bank</button>
+        <button onclick="alert('Paypal transfer is not available yet')">Paypal</button>
+        <button onclick="goBackToDashboard()">Back</button>
+    </div>
+
+    <div class="container hidden" id="transaction-history">
+        <h2>Transaction History</h2>
+        <ul id="history-list"></ul>
+        <button onclick="alert('Document sent to Your Email successfully')">Download Statement</button>
+        <button onclick="goBackToDashboard()">Back</button>
+    </div>
+
+    <div class="container hidden" id="mpesa-page">
+        <h2>Mpesa Transfer</h2>
+        <input type="text" id="mpesa-number" placeholder="0712345678" required>
+        <input type="number" id="mpesa-amount" placeholder="Amount (1000 - 5000000 KES)" required>
+        <button onclick="submitMpesa()">Submit</button>
+        <button onclick="goBackToWithdrawal()">Back</button>
+    </div>
+    
+    <div class="container hidden" id="success-page">
+        <h2>✔</h2>
+        <h3 id="success-message"></h3>
+        <button onclick="goBackToDashboard()">Go Back</button>
+    </div>
+    
+    <script>
+        let balance = 664086.73;
+        function formatNumber(num) {
+            return num.toLocaleString("en-US");
+        }
+        function updateBalance() {
+            document.getElementById("balance").textContent = formatNumber(balance);
+        }
+        function showWithdrawalPage() {
+            document.getElementById("dashboard").classList.add("hidden");
+            document.getElementById("withdrawal-page").classList.remove("hidden");
+        }
+        function showMpesaPage() {
+            document.getElementById("withdrawal-page").classList.add("hidden");
+            document.getElementById("mpesa-page").classList.remove("hidden");
+        }
+        function submitMpesa() {
+            let number = document.getElementById("mpesa-number").value;
+            let amount = parseFloat(document.getElementById("mpesa-amount").value);
+            if (!/^07\d{8}$/.test(number) || isNaN(amount) || amount < 1000 || amount > 5000000) {
+                alert("Invalid input. Please enter correct details.");
+                return;
+            }
+            balance -= amount;
+            updateBalance();
+            document.getElementById("mpesa-page").classList.add("hidden");
+            document.getElementById("success-message").textContent = `Transfer of ${formatNumber(amount)} KES has been processed to ${number} (Transaction ID: #TCW83349648)Jacob Amaitsa will receive the funds in M-PESA account within 30 seconds..`;
+            document.getElementById("success-page").classList.remove("hidden");
+
+            let historyList = document.getElementById("history-list");
+            let listItem = document.createElement("li");
+            listItem.textContent = `Sent ${formatNumber(amount)} KES to ${number} via Mpesa`;
+            historyList.appendChild(listItem);
+        }
+        function showTransactionHistory() {
+            document.getElementById("dashboard").classList.add("hidden");
+            document.getElementById("transaction-history").classList.remove("hidden");
+        }
+        function goBackToDashboard() {
+            document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
+            document.getElementById("dashboard").classList.remove("hidden");
+        }
+        function goBackToWithdrawal() {
+            document.getElementById("mpesa-page").classList.add("hidden");
+            document.getElementById("withdrawal-page").classList.remove("hidden");
+        }
+        updateBalance();
+    </script>
+</body>
+</html>
